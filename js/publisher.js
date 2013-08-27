@@ -248,6 +248,10 @@ define([
             var title = fileMgr.currentFile.title;
             utils.saveAs(previewHtml, title + ".html");
         });
+        $(".action-download-pdf").click(function() {
+            var title = fileMgr.currentFile.title;
+            utils.saveAsPdf(previewHtml, title + ".pdf");
+        });
         $(".action-download-template").click(function() {
             var fileDesc = fileMgr.currentFile;
             var content = publisher.applyTemplate(fileDesc, undefined, previewHtml);
