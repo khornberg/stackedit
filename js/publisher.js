@@ -56,7 +56,8 @@ define([
     // Apply template to the current document
     publisher.applyTemplate = function(fileDesc, publishAttributes, html) {
         try {
-            return _.template(settings.template, {
+            var template = (publishAttributes && publishAttributes.customTmpl) || settings.template;
+            return _.template(template, {
                 documentTitle: fileDesc.title,
                 documentMarkdown: fileDesc.content,
                 documentHTML: html,
@@ -72,7 +73,10 @@ define([
     // Used to get content to publish
     function getPublishContent(fileDesc, publishAttributes, html) {
         if(publishAttributes.format === undefined) {
-            publishAttributes.format = $("input:radio[name=radio-publish-format]:checked").prop("value");
+            publishAttributes.format = utils.getInputRadio("radio-publish-format");
+            if(publishAttributes.format == 'template' && utils.getInputChecked("#checkbox-publish-custom-template")) {
+                publishAttributes.customTmpl = utils.getInputValue('#textarea-publish-custom-template');
+            }
         }
         if(publishAttributes.format == "markdown") {
             return fileDesc.content;
@@ -99,7 +103,7 @@ define([
 
         // Dequeue a synchronized location
         var publishAttributes = publishAttributesList.pop();
-        
+
         // Format the content
         var content = getPublishContent(publishFileDesc, publishAttributes, publishHTML);
 
@@ -119,7 +123,7 @@ define([
             publishLocation(callback, errorFlag || error);
         });
     }
-    
+
     // Get the html from the onPreviewFinished callback
     var previewHtml = undefined;
     eventMgr.addListener("onPreviewFinished", function(html) {
@@ -176,7 +180,9 @@ define([
 
         // Reset fields
         utils.resetModalInputs();
-        $("input:radio[name=radio-publish-format][value=" + defaultPublishFormat + "]").prop("checked", true);
+        utils.setInputRadio("radio-publish-format", defaultPublishFormat);
+        utils.setInputChecked("#checkbox-publish-custom-template", false);
+        utils.setInputValue('#textarea-publish-custom-template', settings.template);
 
         // Load preferences
         var publishPreferences = utils.retrieveIgnoreError(provider.providerId + ".publishPreferences");
@@ -185,10 +191,12 @@ define([
                 utils.setInputValue("#input-publish-" + inputId, publishPreferences[inputId]);
             });
             utils.setInputRadio("radio-publish-format", publishPreferences.format);
+            utils.setInputChecked("#checkbox-publish-custom-template-toggle", publishPreferences.customTmpl !== undefined);
+            utils.setInputValue('#checkbox-publish-custom-template', publishPreferences.customTmpl || settings.template);
         }
 
         // Open dialog box
-        $("#modal-publish").modal();
+        $(".modal-publish").modal();
     }
 
     // Add a new publish location to a local document
@@ -216,31 +224,59 @@ define([
         // dialog
         var publishPreferences = {};
         _.each(provider.publishPreferencesInputIds, function(inputId) {
-            publishPreferences[inputId] = $("#input-publish-" + inputId).val();
+            publishPreferences[inputId] = document.getElementById("input-publish-" + inputId).value;
         });
         publishPreferences.format = publishAttributes.format;
+        publishPreferences.customTmpl = publishAttributes.customTmpl;
         localStorage[provider.providerId + ".publishPreferences"] = JSON.stringify(publishPreferences);
     }
 
+    var initPublishButtonTmpl = [
+        '<li>',
+        '   <a href="#"',
+        '    class="action-init-publish-<%= provider.providerId %>">',
+        '       <i class="icon-provider-<%= provider.providerId %>"></i> <%= provider.providerName %>',
+        '   </a>',
+        '</li>'
+    ].join('');
     eventMgr.addListener("onReady", function() {
-        // Add every provider
-        var publishMenu = $(".collapse-publish-on");
-        _.each(providerMap, function(provider) {
-            // Provider's publish button
-            publishMenu.append($("<li>").append($('<a href="#"><i class="icon-provider-' + provider.providerId + '"></i> ' + provider.providerName + '</a>').click(function() {
-                initNewLocation(provider);
-            })));
-            // Action links (if any)
-            $(".action-publish-" + provider.providerId).click(function() {
-                initNewLocation(provider);
+        if(viewerMode === false) {
+            // Add every provider in the panel menu
+            var publishMenuElt = document.querySelector('.menu-panel .collapse-publish-on .nav');
+            var publishMenuHtml = _.reduce(providerMap, function(result, provider) {
+                return result + _.template(initPublishButtonTmpl, {
+                    provider: provider
+                });
+            }, '');
+            publishMenuElt.innerHTML = publishMenuHtml;
+            _.each(providerMap, function(provider) {
+                // Click on open publish dialog
+                $(publishMenuElt.querySelector('.action-init-publish-' + provider.providerId)).click(function() {
+                    initNewLocation(provider);
+                });
+                // Click on perform new publication
+                $(".action-publish-" + provider.providerId).click(function() {
+                    initNewLocation(provider);
+                });
             });
-        });
-
+        }
+        
+        // 
         $(".action-process-publish").click(performNewLocation);
+        
+        var $customTmplCollapseElt = $('.publish-custom-template-collapse').collapse();
+        var $customTmplTextareaElt = $('#textarea-publish-custom-template');
+        $("#checkbox-publish-custom-template").change(function() {
+            $customTmplTextareaElt.prop('disabled', !this.checked);
+        });
+        $("input:radio[name=radio-publish-format]").change(function() {
+            $customTmplCollapseElt.collapse(this.value == 'template' ? 'show' : 'hide');
+        });
+        
 
         // Save As menu items
         $(".action-download-md").click(function() {
-            var content = $("#wmd-input").val();
+            var content = document.getElementById("wmd-input").value;
             var title = fileMgr.currentFile.title;
             utils.saveAs(content, title + ".md");
         });

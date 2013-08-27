@@ -8,13 +8,16 @@ define([
     "text!html/settingsExtensionsAccordion.html",
     "extensions/partialRendering",
     "extensions/userCustom",
+    "extensions/buttonMarkdownSyntax",
     "extensions/googleAnalytics",
     "extensions/dialogAbout",
     "extensions/dialogManagePublication",
     "extensions/dialogManageSynchronization",
     "extensions/dialogOpenHarddrive",
-    "extensions/documentSelector",
     "extensions/documentTitle",
+    "extensions/documentSelector",
+    "extensions/documentPanel",
+    "extensions/documentManager",
     "extensions/workingIndicator",
     "extensions/notifications",
     "extensions/markdownExtra",
@@ -27,7 +30,6 @@ define([
     "extensions/buttonShare",
     "extensions/buttonStat",
     "extensions/buttonHtmlCode",
-    "extensions/buttonMarkdownSyntax",
     "extensions/buttonViewer",
     "libs/bootstrap/bootstrap",
     "libs/jquery.waitforimages"
@@ -43,26 +45,31 @@ define([
     // Configure extensions
     extensionSettings = settings.extensionSettings || {};
     _.each(extensionList, function(extension) {
-        // Set the extension.config attribute from settings or default configuration
+        // Set the extension.config attribute from settings or default
+        // configuration
         extension.config = _.extend({}, extension.defaultConfig, extensionSettings[extension.extensionId]);
         if(viewerMode === true && extension.disableInViewer === true) {
-            // Skip enabling the extension if we are in the viewer and extension doesn't support it
+            // Skip enabling the extension if we are in the viewer and extension
+            // doesn't support it
             extension.enabled = false;
         }
         else {
-            // Enable the extension if it's not optional or it has not been disabled by the user
-            extension.enabled = !extension.isOptional || extension.config.enabled === undefined || extension.config.enabled === true;        
+            // Enable the extension if it's not optional or it has not been
+            // disabled by the user
+            extension.enabled = !extension.isOptional || extension.config.enabled === undefined || extension.config.enabled === true;
         }
     });
-    
-    // Returns all listeners with the specified name that are implemented in the enabled extensions
+
+    // Returns all listeners with the specified name that are implemented in the
+    // enabled extensions
     function getExtensionListenerList(eventName) {
         return _.chain(extensionList).map(function(extension) {
             return extension.enabled && extension[eventName];
         }).compact().value();
     }
 
-    // Returns a function that calls every listeners with the specified name from all enabled extensions
+    // Returns a function that calls every listeners with the specified name
+    // from all enabled extensions
     var eventListenerListMap = {};
     function createEventHook(eventName) {
         eventListenerListMap[eventName] = getExtensionListenerList(eventName);
@@ -75,12 +82,12 @@ define([
                     listener.apply(null, eventArguments);
                 }
                 catch(e) {
-                    console.error(e);
+                    console.error(_.isObject(e) ? e.stack : e);
                 }
             });
         };
     }
-    
+
     // Add a Hook to the eventMgr that we can fire using eventMgr.eventName()
     function addEventHook(eventName) {
         eventMgr[eventName] = createEventHook(eventName);
@@ -90,7 +97,8 @@ define([
     eventMgr.addListener = function(eventName, listener) {
         try {
             eventListenerListMap[eventName].push(listener);
-        } catch(e) {
+        }
+        catch(e) {
             console.error('No event listener called ' + eventName);
         }
     };
@@ -140,6 +148,9 @@ define([
     addEventHook("onContentChanged");
     addEventHook("onTitleChanged");
 
+    // Operations on folders
+    addEventHook("onFoldersChanged");
+
     // Sync events
     addEventHook("onSyncRunning");
     addEventHook("onSyncSuccess");
@@ -166,7 +177,7 @@ define([
     // The number of times we expect tryFinished to be called
     var nbAsyncPreviewListener = onAsyncPreviewListenerList.length + 1;
     var previewContentsElt = undefined;
-    var previewContentsJQElt = undefined;
+    var $previewContentsElt = undefined;
     eventMgr["onAsyncPreview"] = function() {
         logger.log("onAsyncPreview");
         logger.log("Conversion time: " + (new Date() - eventMgr.previewStartTime));
@@ -185,7 +196,7 @@ define([
             }
         }
         // We assume images are loading in the preview
-        previewContentsJQElt.waitForImages(tryFinished);
+        $previewContentsElt.waitForImages(tryFinished);
         _.each(onAsyncPreviewListenerList, function(asyncPreviewListener) {
             asyncPreviewListener(tryFinished);
         });
@@ -194,8 +205,8 @@ define([
     var onReady = createEventHook("onReady");
     eventMgr["onReady"] = function() {
         previewContentsElt = document.getElementById('preview-contents');
-        previewContentsJQElt = $(previewContentsElt);
-        
+        $previewContentsElt = $(previewContentsElt);
+
         if(viewerMode === false) {
             // Create accordion in settings dialog
             var accordionHtml = _.chain(extensionList).sortBy(function(extension) {
@@ -206,10 +217,10 @@ define([
                     extensionName: extension.extensionName,
                     isOptional: extension.isOptional,
                     settingsBlock: extension.settingsBlock
-                }): "");
+                }) : "");
             }, "").value();
-            document.getElementById('accordion-extensions').innerHTML = accordionHtml;
-            
+            document.querySelector('.accordion-extensions').innerHTML = accordionHtml;
+
             // Create a button from an extension listener
             function createBtn(listener) {
                 var buttonGrpElt = crel('div', {
@@ -241,7 +252,20 @@ define([
             _.each(onCreatePreviewButtonListenerList, function(listener) {
                 extensionPreviewButtonsFragment.appendChild(createBtn(listener));
             });
-            document.getElementById('extension-preview-buttons').appendChild(extensionPreviewButtonsFragment);
+            var previewButtonsElt = document.querySelector('.extension-preview-buttons');
+            previewButtonsElt.appendChild(extensionPreviewButtonsFragment);
+
+            // A bit of jQuery...
+            var $previewButtonsElt = $(previewButtonsElt);
+            var previewButtonsWidth = $previewButtonsElt.width();
+            $previewButtonsElt.find('.btn-group').each(function() {
+                var $btnGroupElt = $(this);
+                // Align dropdown to the left of the screen
+                $btnGroupElt.find('.dropdown-menu').css({
+                    right: -previewButtonsWidth + $btnGroupElt.width() + $btnGroupElt.position().left
+                });
+            });
+
         }
 
         // Call onReady listeners

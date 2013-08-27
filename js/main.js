@@ -17,7 +17,7 @@ requirejs.config({
         "jquery": "libs/jquery",
         "underscore": "libs/underscore",
         "crel": "libs/crel",
-        "jgrowl": "libs/jgrowl",
+        "jgrowl": "libs/jgrowl/jquery.jgrowl",
         "mousetrap": "libs/mousetrap",
         "toMarkdown": "libs/to-markdown",
         "text": "libs/text",
@@ -59,8 +59,8 @@ requirejs.config({
         ],
         'libs/Markdown.Extra': [
             'libs/Markdown.Converter',
-            'libs/prettify',
-            'libs/highlight.pack',
+            'libs/prettify/prettify',
+            'libs/highlight/highlight.pack',
         ],
         'libs/Markdown.Editor': [
             'libs/Markdown.Converter'
@@ -84,6 +84,9 @@ if(location.search.match(/(\?|&)console/)) {
     logger = console;
 }
 
+var viewerMode = /(^| )viewer($| )/.test(document.body.className);
+var theme = localStorage.theme || 'default';
+
 // RequireJS entry point. By requiring synchronizer, publisher and
 // media-importer, we are actually loading all the modules
 require([
@@ -93,7 +96,7 @@ require([
     "publisher",
     "mediaImporter",
     "css",
-    "less!styles/main.less",
+    "less!styles/" + theme + ".less",
 ], function($, core) {
 
     $(function() {

@@ -122,7 +122,7 @@ define([
     // Set checkbox state
     utils.setInputChecked = function(element, checked) {
         element = jqElt(element);
-        element.prop("checked", checked);
+        element.prop("checked", checked).change();
     };
 
     // Get radio button value
@@ -132,13 +132,13 @@ define([
 
     // Set radio button value
     utils.setInputRadio = function(name, value) {
-        $("input:radio[name=" + name + "][value=" + value + "]").prop("checked", true);
+        $("input:radio[name=" + name + "][value=" + value + "]").prop("checked", true).change();
     };
 
     // Reset input control in all modals
     utils.resetModalInputs = function() {
         $(".modal input[type=text]:not([disabled]), .modal input[type=password], .modal textarea").val("");
-        $(".modal input[type=checkbox]").prop("checked", false);
+        $(".modal input[type=checkbox]").prop("checked", false).change();
     };
 
     // Basic trim function
@@ -169,15 +169,26 @@ define([
         return url;
     };
     
+    // Create the modal element and add to the body
     utils.addModal = function(id, content) {
         var modal = crel('div', {
-            id: id,
-            class: 'modal'
+            class: 'modal ' + id
         });
         modal.innerHTML = content;
-        document.getElementsByTagName('body')[0].appendChild(modal);
+        document.body.appendChild(modal);
     };
 
+    // Create a backdrop and add to the body
+    utils.createBackdrop = function(toggle, target) {
+        var result = crel('div', {
+            'class': 'modal-backdrop in',
+            'data-toggle': toggle,
+            'data-target': target,
+        });
+        document.body.appendChild(result);
+        return result;
+    };
+    
     // Create an centered popup window
     utils.popupWindow = function(url, title, width, height) {
         var left = (screen.width / 2) - (width / 2);

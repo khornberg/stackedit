@@ -284,7 +284,7 @@ define([
         }
 
         // Open dialog box
-        $("#modal-upload-" + provider.providerId).modal();
+        $(".modal-upload-" + provider.providerId).modal();
     }
 
     eventMgr.addListener("onReady", function() {
@@ -341,24 +341,9 @@ define([
                 // export dialog
                 var exportPreferences = {};
                 _.each(provider.exportPreferencesInputIds, function(inputId) {
-                    exportPreferences[inputId] = $("#input-sync-export-" + inputId).val();
+                    exportPreferences[inputId] = document.getElementById("input-sync-export-" + inputId).value;
                 });
                 localStorage[provider.providerId + ".exportPreferences"] = JSON.stringify(exportPreferences);
-            });
-            // Provider's manual export button
-            $(".action-sync-manual-" + provider.providerId).click(function(event) {
-                var fileDesc = fileMgr.currentFile;
-                if(_.size(fileDesc.syncLocations) > 0 && _.first(_.values(fileDesc.syncLocations)).isRealtime) {
-                    eventMgr.onError("Real time collaborative document can't be synchronized with multiple locations");
-                    return;
-                }
-                provider.exportManual(event, fileDesc.title, fileDesc.content, function(error, syncAttributes) {
-                    if(error) {
-                        return;
-                    }
-                    fileDesc.addSyncLocation(syncAttributes);
-                    eventMgr.onSyncExportSuccess(fileDesc, syncAttributes);
-                });
             });
         });
     });

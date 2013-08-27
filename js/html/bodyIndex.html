@@ -1,37 +1,39 @@
 <div class="navbar navbar-fixed-top ui-layout-north">
 	<div class="navbar-inner">
-
+		<div class="nav left-space"></div>
+		<div class="nav right-space pull-right"></div>
 		<ul class="nav">
-			<li><div id="wmd-button-bar"></div></li>
+			<li class="wmd-button-group1 btn-group"></li>
+		</ul>
+		<ul class="nav">
+			<li class="wmd-button-group2 btn-group"></li>
+		</ul>
+		<ul class="nav">
+			<li class="wmd-button-group3 btn-group"></li>
+		</ul>
+		<ul class="nav">
+			<li class="wmd-button-group4 btn-group"></li>
 		</ul>
 		<ul class="nav pull-right">
-			<li id="extension-buttons"></li>
 			<li class="btn-group"><button
 					class="btn btn-success action-create-file"
 					title="New local document">
 					<i class="icon-file"></i>
 				</button>
-				<button class="btn btn-success" title="Delete local document"
-					data-toggle="modal" data-target="#modal-remove-file-confirm">
+				<button class="btn btn-success" title="Delete current document"
+					data-toggle="modal" data-target=".modal-remove-file-confirm">
 					<i class="icon-trash"></i>
 				</button></li>
-			<li>
-				<button data-toggle="dropdown" class="action-open-file hide"></button>
-				<ul class="dropdown-menu file-selector">
-					<li class="stick">
-						<div class="input-group">
-							<span class="input-group-addon"><i class="icon-search"></i></span><input
-								type="text" id="file-search" class="col-lg-3 form-control">
-						</div>
-					</li>
-				</ul>
-			</li>
+		</ul>
+		<ul class="nav pull-right">
+			<li id="extension-buttons"></li>
 		</ul>
 		<ul class="nav pull-right">
 			<li><a class="btn btn-success file-title-navbar" href="#"
 				title="Rename current document"> </a></li>
 			<li><input type="text"
-				class="col-lg-4 form-control hide input-file-title" placeholder="Document title" /></li>
+				class="col-lg-4 form-control hide input-file-title"
+				placeholder="Document title" /></li>
 		</ul>
 		<ul class="nav pull-right">
 			<li><i class="working-indicator icon-none"></i></li>
@@ -41,18 +43,8 @@
 <textarea id="wmd-input" class="ui-layout-center form-control"></textarea>
 <div class="ui-layout-east preview-container"></div>
 <div class="ui-layout-south preview-container"></div>
+<div id="wmd-button-bar" class="hide"></div>
 
-
-<div class="document-panel collapse width">
-	<button class="btn btn-success collapse-button" data-toggle="collapse"
-		data-target=".document-panel" title="Menu">
-		<i class="icon-folder-open"></i> <i class="icon-right-dir"></i>
-	</button>
-	<div class="panel-content">
-		<div class="list-group">
-		</div>
-		</div>
-</div>
 <div class="menu-panel collapse width">
 	<button class="btn btn-success collapse-button" data-toggle="collapse"
 		data-target=".menu-panel" title="Menu">
@@ -66,46 +58,59 @@
 				StackEdit Viewer</a> <a href="#" data-toggle="collapse"
 				data-target=".collapse-open-from" class="list-group-item"><i
 				class="icon-hdd"></i> Open from...</a>
-			<ul class="nav collapse collapse-open-from">
-				<li><a data-toggle="modal"
-					data-target="#modal-import-harddrive-markdown"
-					class="action-reset-input" href="#">Import from hard drive</a></li>
-				<li><a data-toggle="modal"
-					data-target="#modal-import-harddrive-html"
-					class="action-reset-input" href="#">Convert HTML to Markdown</a></li>
-			</ul>
+			<div class="sub-menu collapse collapse-open-from clearfix">
+				<ul class="nav">
+					<li><a data-toggle="modal"
+						data-target=".modal-import-harddrive-markdown"
+						class="action-reset-input" href="#">Import from hard drive</a></li>
+					<li><a data-toggle="modal"
+						data-target=".modal-import-harddrive-html"
+						class="action-reset-input" href="#">Convert HTML to Markdown</a></li>
+				</ul>
+			</div>
 
 			<a href="#" data-toggle="collapse" data-target=".collapse-save-as"
 				class="list-group-item"><i class="icon-hdd"></i> Save as...</a>
-			<ul class="nav collapse collapse-save-as">
-				<li><a class="action-download-md" href="#">Save as Markdown</a></li>
-				<li><a class="action-download-html" href="#">Save as HTML</a></li>
-				<li><a class="action-download-pdf" href="#">Save as PDF</a></li>
-				<li><a class="action-download-template" href="#">Save using
-						template</a></li>
-			</ul>
+
+			<div class="sub-menu collapse collapse-save-as clearfix">
+				<ul class="nav">
+					<li><a class="action-download-md" href="#">Save as
+							Markdown</a></li>
+					<li><a class="action-download-html" href="#">Save as HTML</a></li>
+					<li><a class="action-download-pdf" href="#">Save as PDF</a></li>
+					<li><a class="action-download-template" href="#">Save
+							using template</a></li>
+				</ul>
+			</div>
+
 		</div>
 		<div class=dropdown-header>SYNCHRONIZE</div>
 		<div class="list-group">
 			<a href="#" data-toggle="collapse"
 				data-target=".collapse-sync-gdrive" class="list-group-item"><i
 				class="icon-provider-gdrive"></i> Google Drive</a>
-			<ul class="nav collapse collapse-sync-gdrive">
-				<li><a href="#" class="action-sync-import-gdrive">Import
-						from Google Drive</a></li>
-				<li><a href="#" class="action-sync-export-dialog-gdrive">Export
-						to Google Drive</a></li>
-			</ul>
+			<div class="sub-menu collapse collapse-sync-gdrive clearfix">
+				<ul class="nav">
+					<li><a href="#" class="action-sync-import-gdrive"
+						data-toggle="collapse" data-target=".menu-panel">Import from
+							Google Drive</a></li>
+					<li><a href="#" class="action-sync-export-dialog-gdrive">Export
+							to Google Drive</a></li>
+				</ul>
+			</div>
 			<a href="#" data-toggle="collapse"
 				data-target=".collapse-sync-dropbox" class="list-group-item"><i
 				class="icon-provider-dropbox"></i> Dropbox</a>
-			<ul class="nav collapse collapse-sync-dropbox">
-				<li><a class="action-sync-import-dropbox" href="#">Import
-						from Dropbox</a></li>
-				<li><a href="#" class="action-sync-export-dialog-dropbox">Export
-						to Dropbox</a></li>
-			</ul>
-			<a href="#" data-toggle="modal" data-target="#modal-manage-sync"
+			<div class="sub-menu collapse collapse-sync-dropbox clearfix">
+				<ul class="nav">
+					<li><a class="action-sync-import-dropbox" href="#"
+						data-toggle="collapse" data-target=".menu-panel">Import from
+							Dropbox</a></li>
+					<li><a href="#" class="action-sync-export-dialog-dropbox">Export
+							to Dropbox</a></li>
+				</ul>
+			</div>
+			<a href="#" data-toggle="modal" data-target=".modal-manage-sync"
 				class="action-reset-input list-group-item"><i
 				class="icon-refresh"></i> Manage synchronization</a>
 		</div>
@@ -113,32 +118,113 @@
 		<div class="list-group">
 			<a href="#" data-toggle="collapse" data-target=".collapse-publish-on"
 				class="list-group-item"><i class="icon-share"></i> Publish on...</a>
-			<ul class="nav collapse collapse-publish-on">
-			</ul>
-			<a href="#" data-toggle="modal" data-target="#modal-manage-publish"
+			<div class="sub-menu collapse collapse-publish-on clearfix">
+				<ul class="nav">
+				</ul>
+			</div>
+			<a href="#" data-toggle="modal" data-target=".modal-manage-publish"
 				class="action-reset-input list-group-item"><i class="icon-share"></i>
 				Manage publication</a>
 		</div>
 		<ul class="nav">
 			<li><a href="#" data-toggle="modal"
-				data-target="#modal-settings"
-				class="action-load-settings list-group-item"><i class="icon-cog"></i>
-					Settings</a></li>
-			<li><a href="#" data-toggle="modal" data-target="#modal-about"
-				class=" list-group-item"><i class="icon-help-circled"></i> About</a></li>
+				data-target=".modal-settings" class="action-load-settings"><i
+					class="icon-cog"></i> Settings</a></li>
+			<li><a href="#" data-toggle="modal" data-target=".modal-about"><i
+					class="icon-help-circled"></i> About</a></li>
 		</ul>
 
 	</div>
 </div>
 
 
-<div id="modal-insert-link" class="modal">
+<div class="document-panel collapse width">
+	<button class="btn btn-success collapse-button" data-toggle="collapse"
+		data-target=".document-panel" title="Select document">
+		<i class="icon-folder-open"></i> <i class="icon-right-dir"></i>
+	</button>
+	<div class="search-bar clearfix">
+		<div class="input-group">
+			<span class="input-group-addon"><i class="icon-search"></i></span><input
+				type="text" class="form-control"></input>
+			<button type="button" class="close" title="clear">&times;</button>
+			<div class="input-group-btn">
+				<a data-toggle="modal" data-target=".modal-document-manager"
+					class="btn btn-link" title="Manage documents"><i
+					class="icon-layers"></i></a>
+			</div>
+		</div>
+	</div>
+	<div class="panel-content">
+		<div class="list-group document-list"></div>
+		<div class="list-group document-list-filtered hide"></div>
+	</div>
+</div>
+
+
+<div class="modal modal-document-manager">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
 			<div class="modal-header">
-				<button type="button" class="close action-close-insert-link"
-					data-dismiss="modal" aria-hidden="true">&times;</button>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h3 class="modal-title">Manage documents</h3>
+			</div>
+			<div class="modal-body">
+				<div></div>
+				<ul class="nav nav-pills document-list">
+					<li class="pull-right dropdown"><a href="#"
+						data-toggle="dropdown"><i class="icon-check"></i> Selection <b
+							class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li><a href="#" class="action-select-all"><i
+									class="icon-check"></i> Select all</a></li>
+							<li><a href="#" class="action-unselect-all"><i
+									class="icon-check-empty"></i> Unselect all</a></li>
+							<li class="divider"></li>
+							<li><a href="#" class="action-move-items"><i
+									class="icon-forward"></i> Move to folder</a></li>
+							<li><a href="#" class="action-delete-items"><i
+									class="icon-trash"></i> Delete</a></li>
+						</ul></li>
+					<li class="pull-right"><a href="#"
+						class="action-create-folder"> <i class="icon-folder"></i>
+							Create folder
+					</a></li>
+					<li class="disabled"><a><i class="icon-file"></i> <span
+							class="document-count"></span></a></li>
+					<li class="disabled"><a><i class="icon-folder"></i> <span
+							class="folder-count"></span></a></li>
+				</ul>
+				<div class="list-group document-list"></div>
+				<p class="confirm-delete hide">The following documents will be
+					deleted locally:</p>
+				<p class="choose-folder hide">Please choose a destination
+					folder:</p>
+				<div class="list-group selected-document-list hide"></div>
+				<div class="list-group select-folder-list hide"></div>
+			</div>
+			<div class="modal-footer">
+				<a href="#"
+					class="btn btn-default confirm-delete choose-folder action-cancel hide">Cancel</a>
+				<a href="#"
+					class="btn btn-primary confirm-delete action-delete-items-confirm hide">OK</a>
+				<a href="#" class="btn btn-primary document-list"
+					data-dismiss="modal">Close</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal modal-insert-link">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
 				<h3 class="modal-title">Hyperlink</h3>
 			</div>
 			<div class="modal-body">
@@ -159,13 +245,13 @@
 </div>
 
 
-<div id="modal-insert-image" class="modal">
+<div class="modal modal-insert-image">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
 			<div class="modal-header">
-				<button type="button" class="close action-close-insert-link"
-					data-dismiss="modal" aria-hidden="true">&times;</button>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
 				<h3 class="modal-title">Image</h3>
 			</div>
 			<div class="modal-body">
@@ -188,13 +274,13 @@
 </div>
 
 
-<div id="modal-import-image" class="modal">
+<div class="modal modal-import-image">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
 			<div class="modal-header">
-				<button type="button" class="close action-close-insert-link"
-					data-dismiss="modal" aria-hidden="true">&times;</button>
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
 				<h3 class="modal-title">Google+ image import</h3>
 			</div>
 			<div class="modal-body">
@@ -232,7 +318,7 @@
 </div>
 
 
-<div id="modal-remove-file-confirm" class="modal">
+<div class="modal modal-remove-file-confirm">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -245,7 +331,7 @@
 				<p>
 					Are you sure you want to delete "<span class="file-title"></span>"?
 				</p>
-				<blockquote class="muted">
+				<blockquote>
 					<b>NOTE:</b> This will not delete the file on synchronized
 					locations.
 				</blockquote>
@@ -260,7 +346,7 @@
 </div>
 
 
-<div id="modal-import-harddrive-markdown" class="modal">
+<div class="modal modal-import-harddrive-markdown">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -287,7 +373,7 @@
 </div>
 
 
-<div id="modal-import-harddrive-html" class="modal">
+<div class="modal modal-import-harddrive-html">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -306,7 +392,7 @@
 				<p id="dropzone-import-harddrive-html" class="drop-zone">Drop
 					files here</p>
 				<p>Or insert your HTML code here:</p>
-				<textarea id="input-convert-html"></textarea>
+				<textarea id="input-convert-html" class="form-control"></textarea>
 			</div>
 			<div class="modal-footer">
 				<a href="#" class="btn btn-default" data-dismiss="modal">Close</a> <a
@@ -318,7 +404,7 @@
 </div>
 
 
-<div id="modal-upload-gdrive" class="modal">
+<div class="modal modal-upload-gdrive">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -328,35 +414,48 @@
 				<h3 class="modal-title">Export to Google Drive</h3>
 			</div>
 			<div class="modal-body">
-				<blockquote class="muted">This will save the current
-					document to your Google Drive account and keep it synchronized.</blockquote>
 				<p>
-					Please specify a <b>folder ID</b> (optional):
+					This will save "<span class="file-title"></span>" to your Google
+					Drive account and keep it synchronized.
 				</p>
-				<div class="input-prepend">
-					<span class="add-on"><i class="icon-provider-gdrive"></i></span><input
-						id="input-sync-export-gdrive-parentid" type="text"
-						class="col-lg-5 form-control" placeholder="FolderID"></input>
+				<div class="form-horizontal">
+					<div class="form-group">
+						<label class="col-lg-3 control-label"
+							for="input-sync-export-gdrive-parentid">Folder ID
+							(optional)</label>
+						<div class="col-lg-8">
+							<input type="text" id="input-sync-export-gdrive-parentid"
+								placeholder="FolderID" class="form-control"> <span
+								class="help-block"> If no folder ID is supplied, the file
+								will be created in your root folder. </span>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-lg-3 control-label"></div>
+						<div class="col-lg-8">
+							<label> <input id="input-sync-export-gdrive-realtime"
+								type="checkbox"> Create a real time collaborative
+								document
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-lg-3 control-label"
+							for="input-sync-export-gdrive-fileid">Existing file ID
+							(optional)</label>
+						<div class="col-lg-8">
+							<input type="text" id="input-sync-export-gdrive-fileid"
+								placeholder="FileID" class="form-control"> <span
+								class="help-block"> This will overwrite the existing file
+								on the server. </span>
+						</div>
+					</div>
 				</div>
-				<br /> <br />
-				<blockquote class="muted">
+				<blockquote>
 					<b>NOTE:</b>
 					<ul>
-						<li>If no folder ID is supplied, the file will be created in
-							your root folder.</li>
 						<li>You can move or rename the file afterwards within Google
 							Drive.</li>
-					</ul>
-				</blockquote>
-				<div class="checkbox">
-					<label> <input id="input-sync-export-gdrive-realtime"
-						type="checkbox"> Create a real time collaborative document
-					</label>
-				</div>
-				<br /> <br />
-				<blockquote class="muted">
-					<b>NOTE:</b>
-					<ul>
 						<li>Real time collaborative documents can't be open outside
 							StackEdit.</li>
 						<li>Real time collaborative documents can't have multiple
@@ -374,7 +473,7 @@
 </div>
 
 
-<div id="modal-upload-dropbox" class="modal">
+<div class="modal modal-upload-dropbox">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -384,19 +483,23 @@
 				<h3 class="modal-title">Export to Dropbox</h3>
 			</div>
 			<div class="modal-body">
-				<blockquote class="muted">This will save the current
-					document to your Dropbox account and keep it synchronized.</blockquote>
 				<p>
-					Please specify a <b>file path</b> for "<span class="file-title"></span>":
+					This will save "<span class="file-title"></span>" to your Dropbox
+					account and keep it synchronized.
 				</p>
-				<div class="input-prepend">
-					<span class="add-on"><i class="icon-provider-dropbox"></i></span><input
-						id="input-sync-export-dropbox-path" type="text"
-						class="col-lg-5 form-control"
-						placeholder="/path/to/My Document.md"></input>
+				<div class="form-horizontal">
+					<div class="form-group">
+						<label class="col-lg-3 control-label"
+							for="input-sync-export-dropbox-path">File path</label>
+						<div class="col-lg-8">
+							<input type="text" id="input-sync-export-dropbox-path"
+								placeholder="/path/to/My Document.md" class="form-control">
+							<span class="help-block"> File path is composed of both
+								folder and filename. </span>
+						</div>
+					</div>
 				</div>
-				<br /> <br />
-				<blockquote class="muted">
+				<blockquote>
 					<b>NOTE:</b>
 					<ul>
 						<li>Dropbox file path does not depend on document title.</li>
@@ -416,7 +519,7 @@
 </div>
 
 
-<div id="modal-manage-sync" class="modal">
+<div class="modal modal-manage-sync">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -430,34 +533,17 @@
 					"<span class="file-title"></span>" is synchronized with the
 					following location(s):
 				</p>
-				<p id="manage-sync-list"></p>
-				<blockquote class="msg-sync-list hide muted">
+				<div class="msg-sync-list sync-list hide"></div>
+				<blockquote class="msg-sync-list hide">
 					<b>NOTE:</b> Removing a synchronized location will not delete any
 					file.
 				</blockquote>
-				<blockquote class="msg-no-sync hide muted">
-					"<span class="file-title"></span>" is not synchronized yet.
-				</blockquote>
-				<p>Add a synchronized location manually:</p>
-				<div class="input-prepend input-append sync-manual">
-					<span class="add-on" title="Google Drive"><i
-						class="icon-provider-gdrive"></i></span><input
-						id="input-sync-manual-gdrive-id" type="text"
-						class="col-lg-5 form-control" placeholder="GoogleDriveFileID"></input>
-					<a class="btn btn-default action-sync-manual-gdrive"
-						title="Add location" data-dismiss="modal"><i class="icon-ok"></i></a>
-				</div>
-				<div class="input-prepend input-append sync-manual">
-					<span class="add-on" title="Dropbox"><i
-						class="icon-provider-dropbox"></i></span><input
-						id="input-sync-manual-dropbox-path" type="text"
-						class="col-lg-5 form-control" placeholder="/dropbox/file/path"></input>
-					<a class="btn btn-default action-sync-manual-dropbox"
-						title="Add location" data-dismiss="modal"><i class="icon-ok"></i></a>
-				</div>
-				<blockquote class="muted">
-					<b>NOTE:</b> This will first upload the document and overwrite the
-					existing file on the server.
+				<blockquote class="msg-no-sync hide">
+					"<span class="file-title"></span>" is not synchronized yet. <br />
+					<br /> <b>NOTE:</b> You can add synchronized locations by
+					exporting your document using <i class="icon-provider-gdrive"></i>
+					Google Drive or <i class="icon-provider-dropbox"></i> Dropbox
+					sub-menu.
 				</blockquote>
 			</div>
 			<div class="modal-footer">
@@ -468,7 +554,7 @@
 </div>
 
 
-<div id="modal-publish" class="modal">
+<div class="modal modal-publish">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -684,6 +770,18 @@
 							</div>
 						</div>
 					</div>
+					<div class="form-group collapse publish-custom-template-collapse">
+						<div class="col-lg-4"></div>
+						<div class="col-lg-7">
+							<div class="checkbox">
+								<label> <input type="checkbox"
+									id="checkbox-publish-custom-template"> Custom template
+								</label> <a href="#" class="tooltip-template">(?)</a>
+							</div>
+							<textarea class="form-control"
+								id="textarea-publish-custom-template"></textarea>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="modal-footer">
@@ -696,7 +794,7 @@
 </div>
 
 
-<div id="modal-manage-publish" class="modal">
+<div class="modal modal-manage-publish">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -710,8 +808,8 @@
 					"<span class="file-title"></span>" is published on the following
 					location(s):
 				</p>
-				<div id="manage-publish-list"></div>
-				<blockquote class="muted">
+				<div class="msg-publish-list publish-list hide"></div>
+				<blockquote>
 					<div class="msg-no-publish hide">
 						"<span class="file-title"></span>" is not published yet. <br /> <br />
 					</div>
@@ -726,7 +824,7 @@
 </div>
 
 
-<div id="modal-settings" class="modal">
+<div class="modal modal-settings">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -821,8 +919,8 @@
 							</div>
 							<div class="form-group">
 								<label class="col-lg-4 control-label"
-									for="textarea-settings-publish-template">Template <a
-									href="#" class="tooltip-template">(?)</a>
+									for="textarea-settings-publish-template">Default
+									template <a href="#" class="tooltip-template">(?)</a>
 								</label>
 								<div class="col-lg-7">
 									<textarea id="textarea-settings-publish-template"
@@ -840,7 +938,7 @@
 						</div>
 					</div>
 					<div class="tab-pane" id="tabpane-settings-extensions">
-						<div class="accordion" id="accordion-extensions"></div>
+						<div class="panel-group accordion-extensions"></div>
 						<span class="help-block pull-right"><a target="_blank"
 							href="https://github.com/benweet/stackedit/blob/master/doc/developer-guide.md#architecture">Create
 								your own extension...</a></span>
@@ -863,7 +961,7 @@
 								data-dismiss="modal"><i class="icon-help-circled icon-white"></i>
 								Welcome document</a> <a href="#" class="btn btn-block btn-primary"
 								data-dismiss="modal" data-toggle="modal"
-								data-target="#modal-app-reset"><i
+								data-target=".modal-app-reset"><i
 								class="icon-fire icon-white"></i> Reset application</a>
 						</div>
 					</div>
@@ -871,34 +969,16 @@
 
 			</div>
 			<div class="modal-footer">
-				<a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
-				<a href="#" class="btn btn-primary action-apply-settings"
-					data-dismiss="modal">OK</a>
+				<a href="#" class="btn btn-default action-apply-theme"
+					data-dismiss="modal">Cancel</a> <a href="#"
+					class="btn btn-primary action-apply-settings" data-dismiss="modal">OK</a>
 			</div>
 		</div>
 	</div>
 </div>
 
 
-<div id="modal-about" class="modal">
-	<div class="modal-dialog">
-		<div class="modal-content">
-
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"
-					aria-hidden="true">&times;</button>
-				<img src="img/stackedit-promo.png" />
-			</div>
-			<div class="modal-body"></div>
-			<div class="modal-footer">
-				<a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
-			</div>
-		</div>
-	</div>
-</div>
-
-
-<div id="modal-non-unique" class="modal">
+<div class="modal modal-non-unique">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -908,8 +988,8 @@
 			<div class="modal-body">
 				<p>StackEdit has stopped because another instance was running in
 					the same browser.</p>
-				<blockquote class="muted">If you want to reopen
-					StackEdit, click on "Reload".</blockquote>
+				<blockquote>If you want to reopen StackEdit, click on
+					"Reload".</blockquote>
 			</div>
 			<div class="modal-footer">
 				<a href="javascript:window.location.reload();"
@@ -920,7 +1000,7 @@
 </div>
 
 
-<div id="modal-app-reset" class="modal">
+<div class="modal modal-app-reset">
 	<div class="modal-dialog">
 		<div class="modal-content">
 
@@ -929,7 +1009,7 @@
 			</div>
 			<div class="modal-body">
 				<p>This will delete all your local documents.</p>
-				<blockquote class="muted">Are you sure?</blockquote>
+				<blockquote>Are you sure?</blockquote>
 			</div>
 			<div class="modal-footer">
 				<a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>

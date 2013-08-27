@@ -113,7 +113,7 @@ define([
                 title: title,
                 mimeType: contentType
             };
-            if(parentId !== undefined) {
+            if(parentId) {
                 // Specify the directory
                 metadata.parents = [
                     {
@@ -124,7 +124,7 @@ define([
             }
             var path = '/upload/drive/v2/files';
             var method = 'POST';
-            if(fileId !== undefined) {
+            if(fileId) {
                 // If it's an update
                 path += "/" + fileId;
                 method = 'PUT';
@@ -603,10 +603,10 @@ define([
                 }
             });
             picker = pickerBuilder.build();
-            $("body").append($("<div>").addClass("modal-backdrop").click(function() {
+            $(utils.createBackdrop()).click(function() {
                 hidePicker();
                 task.chain();
-            }));
+            });
             picker.setVisible(true);
         });
         task.onSuccess(function() {

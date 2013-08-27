@@ -11,5 +11,14 @@
             indent_level: 1,
         },
     },
-	excludeShallow: ['css/css-builder', 'less/lessc-server', 'less/lessc'],
+	include: [
+		'less!styles/default.less',
+		'less!styles/blue-gray.less',
+		'less!styles/night.less',
+	],
+	excludeShallow: [
+		'css/css-builder',
+		'less/lessc-server',
+		'less/lessc'
+	],
 })

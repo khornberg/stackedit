@@ -41,14 +41,9 @@ define([
             eventMgr.onFileSelected(fileDesc);
 
             // Hide the viewer pencil button
-            if(fileDesc.fileIndex == TEMPORARY_FILE_INDEX) {
-                $(".action-edit-document").removeClass("hide");
-            }
-            else {
-                $(".action-edit-document").addClass("hide");
-            }
+            $(".action-edit-document").toggleClass("hide", fileDesc.fileIndex != TEMPORARY_FILE_INDEX);
         }
-        
+
         // Refresh the editor (even if it's the same file)
         core.initEditor(fileDesc);
     };
@@ -126,6 +121,11 @@ define([
         localStorage.removeItem(fileDesc.fileIndex + ".content");
         localStorage.removeItem(fileDesc.fileIndex + ".sync");
         localStorage.removeItem(fileDesc.fileIndex + ".publish");
+        localStorage.removeItem(fileDesc.fileIndex + ".selectTime");
+        localStorage.removeItem(fileDesc.fileIndex + ".editorStart");
+        localStorage.removeItem(fileDesc.fileIndex + ".editorEnd");
+        localStorage.removeItem(fileDesc.fileIndex + ".editorScrollTop");
+        localStorage.removeItem(fileDesc.fileIndex + ".previewScrollTop");
 
         eventMgr.onFileDeleted(fileDesc);
     };
@@ -151,53 +151,54 @@ define([
     };
 
     eventMgr.addListener("onReady", function() {
+        var $editorElt = $("#wmd-input");
 
         fileMgr.selectFile();
 
-        var fileTitleElt = $('.file-title-navbar');
-        var fileTitleInputElt = $(".input-file-title");
+        var $fileTitleElt = $('.file-title-navbar');
+        var $fileTitleInputElt = $(".input-file-title");
         $(".action-create-file").click(function() {
             var fileDesc = fileMgr.createFile();
             fileMgr.selectFile(fileDesc);
-            var wmdInput = $("#wmd-input").focus().get(0);
+            var wmdInput = $editorElt.focus().get(0);
             if(wmdInput.setSelectionRange) {
                 wmdInput.setSelectionRange(0, 0);
             }
-            fileTitleElt.click();
+            $fileTitleElt.click();
         });
         $(".action-remove-file").click(function() {
             fileMgr.deleteFile();
         });
-        fileTitleElt.click(function() {
+        $fileTitleElt.click(function() {
             if(viewerMode === true) {
                 return;
             }
-            fileTitleElt.addClass('hide');
-            var fileTitleInput = fileTitleInputElt.removeClass('hide');
+            $fileTitleElt.addClass('hide');
+            var fileTitleInput = $fileTitleInputElt.removeClass('hide');
             _.defer(function() {
                 fileTitleInput.focus().get(0).select();
             });
         });
         function applyTitle() {
-            fileTitleInputElt.addClass('hide');
-            fileTitleElt.removeClass('hide');
-            var title = $.trim(fileTitleInputElt.val());
+            $fileTitleInputElt.addClass('hide');
+            $fileTitleElt.removeClass('hide');
+            var title = $.trim($fileTitleInputElt.val());
             var fileDesc = fileMgr.currentFile;
             if(title && title != fileDesc.title) {
                 fileDesc.title = title;
                 eventMgr.onTitleChanged(fileDesc);
             }
-            fileTitleInputElt.val(fileDesc.title);
-            $("#wmd-input").focus();
+            $fileTitleInputElt.val(fileDesc.title);
+            $editorElt.focus();
         }
-        fileTitleInputElt.blur(function() {
+        $fileTitleInputElt.blur(function() {
             applyTitle();
         }).keyup(function(e) {
             if(e.keyCode == 13) {
                 applyTitle();
             }
             if(e.keyCode == 27) {
-                fileTitleInputElt.val("");
+                $fileTitleInputElt.val("");
                 applyTitle();
             }
         });
@@ -205,7 +206,7 @@ define([
             window.location.href = ".";
         });
         $(".action-edit-document").click(function() {
-            var content = $("#wmd-input").val();
+            var content = $editorElt.val();
             var title = fileMgr.currentFile.title;
             var fileDesc = fileMgr.createFile(title, content);
             fileMgr.selectFile(fileDesc);

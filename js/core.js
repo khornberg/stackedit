@@ -1,6 +1,7 @@
 define([
     "jquery",
     "underscore",
+    "crel",
     "utils",
     "settings",
     "eventMgr",
@@ -13,7 +14,7 @@ define([
     "config",
     "libs/layout",
     "libs/Markdown.Editor"
-], function($, _, utils, settings, eventMgr, mousetrap, bodyIndexHTML, bodyViewerHTML, settingsTemplateTooltipHTML, settingsUserCustomExtensionTooltipHTML) {
+], function($, _, crel, utils, settings, eventMgr, mousetrap, bodyIndexHTML, bodyViewerHTML, settingsTemplateTooltipHTML, settingsUserCustomExtensionTooltipHTML) {
 
     var core = {};
 
@@ -59,7 +60,7 @@ define([
                 clearInterval(intervalId);
             }
             $(".modal").modal("hide");
-            $('#modal-non-unique').modal({
+            $('.modal-non-unique').modal({
                 backdrop: "static",
                 keyboard: false
             });
@@ -98,12 +99,14 @@ define([
     }
 
     // Load settings in settings dialog
+    var $themeInputElt = undefined;
     function loadSettings() {
 
         // Layout orientation
         utils.setInputRadio("radio-layout-orientation", settings.layoutOrientation);
         // Theme
-        utils.setInputValue("#input-settings-theme", localStorage.theme);
+        utils.setInputValue($themeInputElt, theme);
+        $themeInputElt.change();
         // Lazy rendering
         utils.setInputChecked("#input-settings-lazy-rendering", settings.lazyRendering);
         // Editor font family
@@ -130,7 +133,7 @@ define([
         // Layout orientation
         newSettings.layoutOrientation = utils.getInputRadio("radio-layout-orientation");
         // Theme
-        var theme = utils.getInputValue("#input-settings-theme");
+        var theme = utils.getInputValue($themeInputElt);
         // Lazy Rendering
         newSettings.lazyRendering = utils.getInputChecked("#input-settings-lazy-rendering");
         // Editor font family
@@ -159,58 +162,74 @@ define([
 
     // Set the panels visibility
     var layout = undefined;
-    var menuPanelElt = undefined;
-    var documentPanelElt = undefined;
+    var $menuPanelElt = undefined;
+    var $documentPanelElt = undefined;
     function setPanelVisibility(forceHide) {
         if(forceHide === true || layout.state.north.isClosed) {
-            menuPanelElt.hide();
-            documentPanelElt.hide();
-        } else {
-            menuPanelElt.show();
-            documentPanelElt.show();
+            $menuPanelElt.hide();
+            $documentPanelElt.hide();
+        }
+        else {
+            $menuPanelElt.show();
+            $documentPanelElt.show();
         }
     }
-    
+
+    // Set the preview button visibility
+    var $previewButtonsElt = undefined;
+    function setPreviewButtonsVisibility(forceHide) {
+        if(forceHide === true || layout.state.east.isClosed) {
+            $previewButtonsElt.hide();
+        }
+        else {
+            $previewButtonsElt.show();
+        }
+    }
+
     // Create the layout
     function createLayout() {
-        if(viewerMode === true) {
-            return;
-        }
         var layoutGlobalConfig = {
             closable: true,
             resizable: false,
             slidable: false,
             livePaneResizing: true,
             enableCursorHotkey: false,
-            spacing_open: 15,
-            spacing_closed: 15,
-            togglerLength_open: 90,
-            togglerLength_closed: 90,
+            resizerDblClickToggle: false,
+            north__spacing_open: 6,
+            north__spacing_closed: 6,
+            spacing_open: 35,
+            spacing_closed: 35,
+            togglerLength_open: 60,
+            togglerLength_closed: 60,
             stateManagement__enabled: false,
             center__minWidth: 200,
             center__minHeight: 200,
             onopen: function() {
                 setPanelVisibility();
+                setPreviewButtonsVisibility();
             },
             onclose_start: function(paneName) {
                 if(paneName == 'north') {
                     setPanelVisibility(true);
+                }
+                else if(paneName == 'east') {
+                    setPreviewButtonsVisibility(true);
                 }
             },
         };
         eventMgr.onLayoutConfigure(layoutGlobalConfig);
         if(settings.layoutOrientation == "horizontal") {
             $(".ui-layout-south").remove();
-            $(".preview-container").html('<div id="extension-preview-buttons"></div><div id="preview-contents"><div id="wmd-preview" class="preview-content"></div></div>');
+            $(".preview-container").html('<div id="preview-contents"><div id="wmd-preview" class="preview-content"></div></div>');
             layout = $('body').layout($.extend(layoutGlobalConfig, {
                 east__resizable: true,
                 east__size: .5,
-                east__minSize: 200
+                east__minSize: 250
             }));
         }
         else if(settings.layoutOrientation == "vertical") {
             $(".ui-layout-east").remove();
-            $(".preview-container").html('<div id="extension-preview-buttons"></div><div id="preview-contents"><div id="wmd-preview" class="preview-content"></div></div>');
+            $(".preview-container").html('<div id="preview-contents"><div id="wmd-preview" class="preview-content"></div></div>');
             layout = $('body').layout($.extend(layoutGlobalConfig, {
                 south__resizable: true,
                 south__size: .5,
@@ -220,10 +239,25 @@ define([
         $(".navbar").click(function() {
             layout.allowOverflow('north');
         });
-        $(".ui-layout-toggler-north").addClass("btn btn-info").append($("<b>").addClass("caret"));
-        $(".ui-layout-toggler-south").addClass("btn btn-info").append($("<b>").addClass("caret"));
-        $(".ui-layout-toggler-east").addClass("btn btn-info").append($("<b>").addClass("caret"));
+        $(".ui-layout-toggler-south").addClass("btn btn-info").html('<i class="icon-none"></i>');
+        $(".ui-layout-toggler-east").addClass("btn btn-info").html('<i class="icon-none"></i>');
+        var $northTogglerElt = $(".ui-layout-toggler-north").addClass("btn btn-info").html('<i class="icon-none"></i>');
+
+        // We attach the preview buttons to the UI layout resizer in order to
+        // have fixed position
+        // We also move the north toggler to the east or south resizer as the
+        // north resizer is very small
+        $previewButtonsElt = $('<div class="extension-preview-buttons">');
+        if(settings.layoutOrientation == "horizontal") {
+            $('.ui-layout-resizer-north').append($previewButtonsElt);
+            $('.ui-layout-resizer-east').append($northTogglerElt);
+        }
+        else {
+            $('.ui-layout-resizer-south').append($previewButtonsElt).append($northTogglerElt);
+        }
+
         setPanelVisibility();
+        setPreviewButtonsVisibility();
 
         eventMgr.onLayoutCreated(layout);
     }
@@ -232,6 +266,7 @@ define([
     var editor = undefined;
     var fileDesc = undefined;
     var documentContent = undefined;
+    var $editorElt = undefined;
     core.initEditor = function(fileDescParam) {
         if(fileDesc !== undefined) {
             eventMgr.onFileClosed(fileDesc);
@@ -239,8 +274,7 @@ define([
         fileDesc = fileDescParam;
         documentContent = undefined;
         var initDocumentContent = fileDesc.content;
-        var editorElt = $("#wmd-input");
-        editorElt.val(initDocumentContent);
+        $editorElt.val(initDocumentContent);
         if(editor !== undefined) {
             // If the editor is already created
             editor.undoManager.reinit(initDocumentContent, fileDesc.editorStart, fileDesc.editorEnd, fileDesc.editorScrollTop);
@@ -248,23 +282,23 @@ define([
             editor.refreshPreview();
             return;
         }
-        var previewContainerElt = $(".preview-container");
+        var $previewContainerElt = $(".preview-container");
 
         // Store editor scrollTop on scroll event
-        editorElt.scroll(function() {
+        $editorElt.scroll(function() {
             if(documentContent !== undefined) {
                 fileDesc.editorScrollTop = $(this).scrollTop();
             }
         });
         // Store editor selection on change
-        editorElt.bind("keyup mouseup", function() {
+        $editorElt.bind("keyup mouseup", function() {
             if(documentContent !== undefined) {
                 fileDesc.editorStart = this.selectionStart;
                 fileDesc.editorEnd = this.selectionEnd;
             }
         });
         // Store preview scrollTop on scroll event
-        previewContainerElt.scroll(function() {
+        $previewContainerElt.scroll(function() {
             if(documentContent !== undefined) {
                 fileDesc.previewScrollTop = $(this).scrollTop();
             }
@@ -272,7 +306,7 @@ define([
 
         // Create the converter and the editor
         var converter = new Markdown.Converter();
-        // Create MD sections for extensions
+        // Parse MD sections for extensions
         converter.hooks.chain("preConversion", function(text) {
             eventMgr.previewStartTime = new Date();
             var tmpText = text + "\n\n";
@@ -298,7 +332,7 @@ define([
         editor.hooks.set("insertLinkDialog", function(callback) {
             core.insertLinkCallback = callback;
             utils.resetModalInputs();
-            $("#modal-insert-link").modal();
+            $(".modal-insert-link").modal();
             return true;
         });
         // Custom insert image dialog
@@ -308,12 +342,12 @@ define([
                 return true;
             }
             utils.resetModalInputs();
-            $("#modal-insert-image").modal();
+            $(".modal-insert-image").modal();
             return true;
         });
 
         function checkDocumentChanges() {
-            var newDocumentContent = editorElt.val();
+            var newDocumentContent = $editorElt.val();
             if(documentContent !== undefined && documentContent != newDocumentContent) {
                 fileDesc.content = newDocumentContent;
                 eventMgr.onContentChanged(fileDesc);
@@ -327,8 +361,8 @@ define([
                 return function() {
                     if(documentContent === undefined) {
                         makePreview();
-                        editorElt.scrollTop(fileDesc.editorScrollTop);
-                        previewContainerElt.scrollTop(fileDesc.previewScrollTop);
+                        $editorElt.scrollTop(fileDesc.editorScrollTop);
+                        $previewContainerElt.scrollTop(fileDesc.previewScrollTop);
                     }
                     else {
                         debouncedMakePreview();
@@ -342,7 +376,7 @@ define([
                 return function() {
                     makePreview();
                     if(documentContent === undefined) {
-                        previewContainerElt.scrollTop(fileDesc.previewScrollTop);
+                        $previewContainerElt.scrollTop(fileDesc.previewScrollTop);
                     }
                     checkDocumentChanges();
                 };
@@ -354,21 +388,25 @@ define([
         editor.undoManager.reinit(initDocumentContent, fileDesc.editorStart, fileDesc.editorEnd, fileDesc.editorScrollTop);
 
         // Hide default buttons
-        $(".wmd-button-row").addClass("btn-group").find("li:not(.wmd-spacer)").addClass("btn btn-success").css("left", 0).find("span").hide();
+        $(".wmd-button-row li").addClass("btn btn-success").css("left", 0).find("span").hide();
 
         // Add customized buttons
-        $("#wmd-bold-button").append($('<i class="icon-bold">'));
-        $("#wmd-italic-button").append($('<i class="icon-italic">'));
-        $("#wmd-link-button").append($('<i class="icon-globe">'));
-        $("#wmd-quote-button").append($('<i class="icon-indent-right">'));
-        $("#wmd-code-button").append($('<i class="icon-code">'));
-        $("#wmd-image-button").append($('<i class="icon-picture">'));
-        $("#wmd-olist-button").append($('<i class="icon-list-numbered">'));
-        $("#wmd-ulist-button").append($('<i class="icon-list-bullet">'));
-        $("#wmd-heading-button").append($('<i class="icon-text-height">'));
-        $("#wmd-hr-button").append($('<i class="icon-ellipsis">'));
-        $("#wmd-undo-button").append($('<i class="icon-reply">'));
-        $("#wmd-redo-button").append($('<i class="icon-forward">'));
+        var $btnGroupElt = $('.wmd-button-group1');
+        $("#wmd-bold-button").append($('<i class="icon-bold">')).appendTo($btnGroupElt);
+        $("#wmd-italic-button").append($('<i class="icon-italic">')).appendTo($btnGroupElt);
+        var $btnGroupElt = $('.wmd-button-group2');
+        $("#wmd-link-button").append($('<i class="icon-globe">')).appendTo($btnGroupElt);
+        $("#wmd-quote-button").append($('<i class="icon-indent-right">')).appendTo($btnGroupElt);
+        $("#wmd-code-button").append($('<i class="icon-code">')).appendTo($btnGroupElt);
+        $("#wmd-image-button").append($('<i class="icon-picture">')).appendTo($btnGroupElt);
+        var $btnGroupElt = $('.wmd-button-group3');
+        $("#wmd-olist-button").append($('<i class="icon-list-numbered">')).appendTo($btnGroupElt);
+        $("#wmd-ulist-button").append($('<i class="icon-list-bullet">')).appendTo($btnGroupElt);
+        $("#wmd-heading-button").append($('<i class="icon-text-height">')).appendTo($btnGroupElt);
+        $("#wmd-hr-button").append($('<i class="icon-ellipsis">')).appendTo($btnGroupElt);
+        var $btnGroupElt = $('.wmd-button-group4');
+        $("#wmd-undo-button").append($('<i class="icon-reply">')).appendTo($btnGroupElt);
+        $("#wmd-redo-button").append($('<i class="icon-forward">')).appendTo($btnGroupElt);
 
         eventMgr.onFileOpen(fileDesc);
     };
@@ -378,7 +416,7 @@ define([
     var uiLocked = false;
     core.lockUI = function(param) {
         uiLocked = param;
-        $("#wmd-input").prop("disabled", uiLocked);
+        $editorElt.prop("disabled", uiLocked);
         $(".navbar-inner .btn").toggleClass("blocked", uiLocked);
         if(uiLocked) {
             $(".lock-ui").removeClass("hide");
@@ -389,13 +427,14 @@ define([
     };
 
     // Initialize multiple things and then fire eventMgr.onReady
+    var isDocumentPanelShown = false;
+    var isMenuPanelShown = false;
     core.onReady = function() {
-
         if(viewerMode === true) {
-            $('body').html(bodyViewerHTML);
+            document.body.innerHTML = bodyViewerHTML;
         }
         else {
-            $('body').html(bodyIndexHTML);
+            document.body.innerHTML = bodyIndexHTML;
         }
 
         // listen to online/offline events
@@ -412,62 +451,64 @@ define([
         $(".dropdown-submenu > a").click(function(e) {
             e.stopPropagation();
         });
-        
-        menuPanelElt = $('.menu-panel');
-        var isMenuPanelShown = false;
-        menuPanelElt.on('shown.bs.collapse', function() {
-            isMenuPanelShown = true;
-            // Register a click listener when menu panel is open
-            $(document).on("click.hide-menu-panel", function(e) {
-                if(!$(e.target).is('.menu-panel [data-toggle=collapse]')) {
-                    // If click outside the panel, close the panel and unregister the listener
-                    menuPanelElt.collapse('hide');
-                    $(document).off("click.hide-menu-panel");
-                    isMenuPanelShown = false;
-                }
-            });
+
+        $menuPanelElt = $('.menu-panel').collapse({
+            toggle: false
         });
-        
-        documentPanelElt = $('.document-panel');
-        var isDocumentPanelShown = false;
-        documentPanelElt.on('shown.bs.collapse', function() {
-            isDocumentPanelShown = true;
-            // Register a click listener when document panel is open
-            $(document).on("click.hide-document-panel", function(e) {
-                if(!$(e.target).is('.document-panel [data-toggle=collapse]')) {
-                    // If click outside the panel, close the panel and unregister the listener
-                    documentPanelElt.collapse('hide');
-                    $(document).off("click.hide-document-panel");
-                    isDocumentPanelShown = false;
-                }
-            });
-        });
-        
-        var isModalShown = false;
-        $('.modal').on('shown.bs.modal', function() {
-            // Focus on the first input when modal opens
-            isModalShown = true;
-            _.defer(function(elt) {
-                elt.find("input:enabled:visible:first").focus();
-            }, $(this));
-        }).on('hidden.bs.modal', function() {
-            // Focus on the editor when modal is gone
-            isModalShown = false;
-            $("#wmd-input").focus();
-        }).keyup(function(e) {
-            // Handle enter key in modals
-            if(e.which == 13 && !$(e.target).is("textarea")) {
-                $(this).find(".modal-footer a:last").click();
+        var menuPanelBackdropElt = undefined;
+        $menuPanelElt.on('show.bs.collapse', function(e) {
+            if(e.target === $menuPanelElt[0]) {
+                isMenuPanelShown = true;
+                menuPanelBackdropElt = utils.createBackdrop('collapse', '.menu-panel');
+                $menuPanelElt.addClass('move-to-front');
+            }
+            else {
+                // Close all open sub-menus when one submenu opens
+                $menuPanelElt.find('.in').collapse('hide');
+            }
+        }).on('hide.bs.collapse', function(e) {
+            if(e.target === $menuPanelElt[0]) {
+                isMenuPanelShown = false;
+                menuPanelBackdropElt.remove();
+                $menuPanelElt.removeClass('move-to-front');
+            }
+        }).on('hidden.bs.collapse', function(e) {
+            if(e.target === $menuPanelElt[0]) {
+                // Close all open sub-menus when menu panel is closed
+                $menuPanelElt.find('.in').collapse('hide');
             }
         });
 
-        // Configure Mousetrap
-        mousetrap.stopCallback = function(e, element, combo) {
-            return uiLocked || isMenuPanelShown || isDocumentPanelShown || isModalShown || $(element).is("input, select, textarea:not(#wmd-input)");
-        };
+        $documentPanelElt = $('.document-panel').collapse({
+            toggle: false
+        });
+        var documentPanelBackdropElt = undefined;
+        $documentPanelElt.on('show.bs.collapse', function(e) {
+            if(e.target === $documentPanelElt[0]) {
+                isDocumentPanelShown = true;
+                documentPanelBackdropElt = utils.createBackdrop('collapse', '.document-panel');
+                $documentPanelElt.addClass('move-to-front');
+            }
+            else {
+                // Close all open sub-menus when one submenu opens
+                $documentPanelElt.find('.in').collapse('hide');
+            }
+        }).on('hide.bs.collapse', function(e) {
+            if(e.target === $documentPanelElt[0]) {
+                isDocumentPanelShown = false;
+                documentPanelBackdropElt.remove();
+                $documentPanelElt.removeClass('move-to-front');
+            }
+        }).on('hidden.bs.collapse', function(e) {
+            if(e.target === $documentPanelElt[0]) {
+                // Close all open sub-menus when menu panel is closed
+                $documentPanelElt.find('.in').collapse('hide');
+            }
+        });
 
         // UI layout
         createLayout();
+        $editorElt = $("#wmd-input");
 
         // Editor's textarea
         $("#wmd-input, #md-section-helper").css({
@@ -478,15 +519,11 @@ define([
         });
 
         // Handle tab key
-        $("#wmd-input").keydown(function(e) {
+        $editorElt.keydown(function(e) {
             if(e.keyCode === 9) {
-                var value = $(this).val();
+                var value = $editorElt.val();
                 var start = this.selectionStart;
                 var end = this.selectionEnd;
-                // IE8 does not support selection attributes
-                if(start === undefined || end === undefined) {
-                    return;
-                }
                 $(this).val(value.substring(0, start) + "\t" + value.substring(end));
                 this.selectionStart = this.selectionEnd = start + 1;
                 e.preventDefault();
@@ -509,11 +546,32 @@ define([
     // Other initialization that are not prioritary
     eventMgr.addListener("onReady", function() {
 
-        // Load theme list
-        var themeOptions = _.reduce(THEME_LIST, function(themeOptions, name, value) {
-            return themeOptions + '<option value="' + value + '">' + name + '</option>';
-        }, "");
-        $("#input-settings-theme").html(themeOptions);
+        var isModalShown = false;
+        $('.modal').on('show.bs.modal', function() {
+            // Close panel if open
+            $menuPanelElt.collapse('hide');
+            $documentPanelElt.collapse('hide');
+            isModalShown = true;
+        }).on('shown.bs.modal', function() {
+            // Focus on the first input when modal opens
+            _.defer(function(elt) {
+                elt.find("input:enabled:visible:first").focus();
+            }, $(this));
+        }).on('hidden.bs.modal', function() {
+            // Focus on the editor when modal is gone
+            isModalShown = false;
+            $editorElt.focus();
+        }).keyup(function(e) {
+            // Handle enter key in modals
+            if(e.which == 13 && !$(e.target).is("textarea")) {
+                $(this).find(".modal-footer a:last").click();
+            }
+        });
+
+        // Configure Mousetrap
+        mousetrap.stopCallback = function(e, element, combo) {
+            return uiLocked || isMenuPanelShown || isDocumentPanelShown || isModalShown || $(element).is("input, select, textarea:not(#wmd-input)");
+        };
 
         // Click events on "insert link" and "insert image" dialog buttons
         $(".action-insert-link").click(function(e) {
@@ -532,7 +590,7 @@ define([
         });
 
         // Hide events on "insert link" and "insert image" dialogs
-        $("#modal-insert-link, #modal-insert-image").on('hidden.bs.modal', function() {
+        $(".modal-insert-link, .modal-insert-image").on('hidden.bs.modal', function() {
             if(core.insertLinkCallback !== undefined) {
                 core.insertLinkCallback(null);
                 core.insertLinkCallback = undefined;
@@ -549,13 +607,37 @@ define([
                 window.location.reload();
             }
         });
+
+        // Hot theme switcher in the settings
+        var currentTheme = theme;
+        function applyTheme(theme) {
+            theme = theme || 'default';
+            if(currentTheme != theme) {
+                var themeModule = "less!styles/" + theme;
+                // Undefine the module in RequireJS
+                requirejs.undef(themeModule);
+                // Then reload the style
+                require([
+                    themeModule + ".less"
+                ]);
+                currentTheme = theme;
+            }
+        }
+        $themeInputElt = $("#input-settings-theme");
+        $themeInputElt.on("change", function() {
+            applyTheme(this.value);
+        });
+        $(".action-apply-theme").click("change", function() {
+            applyTheme(localStorage.theme);
+        });
+
         // Import settings
         $(".action-import-settings").click(function(e) {
             $("#input-file-import-settings").click();
         });
         $("#input-file-import-settings").change(function(evt) {
             var files = (evt.dataTransfer || evt.target).files;
-            $("#modal-settings").modal("hide");
+            $(".modal-settings").modal("hide");
             _.each(files, function(file) {
                 var reader = new FileReader();
                 reader.onload = (function(importedFile) {
@@ -599,21 +681,21 @@ define([
 
         // Tooltips
         $(".tooltip-lazy-rendering").tooltip({
-            container: '#modal-settings',
+            container: '.modal-settings',
             placement: 'right',
             trigger: 'hover',
             title: 'Disable preview rendering while typing in order to offload CPU. Refresh preview after 500 ms of inactivity.'
         });
         $(".tooltip-default-content").tooltip({
             html: true,
-            container: '#modal-settings',
+            container: '.modal-settings',
             placement: 'right',
             trigger: 'hover',
             title: 'Thanks for supporting StackEdit by adding a backlink in your documents!'
         });
         $(".tooltip-usercustom-extension").tooltip({
             html: true,
-            container: '#modal-settings',
+            container: '.modal-settings',
             placement: 'right',
             trigger: 'manual',
             title: settingsUserCustomExtensionTooltipHTML
@@ -625,25 +707,36 @@ define([
             });
             e.stopPropagation();
         });
-        $(".tooltip-template").tooltip({
-            html: true,
-            container: '#modal-settings',
-            placement: 'right',
-            trigger: 'manual',
-            title: settingsTemplateTooltipHTML
-        }).click(function(e) {
-            $(this).tooltip('show');
-            $(document).on("click.tooltip-template", function(e) {
-                $(".tooltip-template").tooltip('hide');
-                $(document).off("click.tooltip-template");
+        _.each(document.querySelectorAll(".tooltip-template"), function(tooltipElt) {
+            var $tooltipElt = $(tooltipElt);
+            $tooltipElt.tooltip({
+                html: true,
+                container: $tooltipElt.parents('.modal'),
+                placement: 'right',
+                trigger: 'manual',
+                title: settingsTemplateTooltipHTML
+            }).click(function(e) {
+                $tooltipElt.tooltip('show');
+                $(document).on("click.tooltip-template", function(e) {
+                    $(".tooltip-template").tooltip('hide');
+                    $(document).off("click.tooltip-template");
+                });
+                e.stopPropagation();
             });
-            e.stopPropagation();
         });
 
         // Avoid dropdown panels to close on click
         $("div.dropdown-menu").click(function(e) {
             e.stopPropagation();
         });
+
+        if(viewerMode === false) {
+            // Load theme list
+            var themeOptions = _.reduce(THEME_LIST, function(themeOptions, name, value) {
+                return themeOptions + '<option value="' + value + '">' + name + '</option>';
+            }, '');
+            document.getElementById('input-settings-theme').innerHTML = themeOptions;
+        }
 
     });
 
