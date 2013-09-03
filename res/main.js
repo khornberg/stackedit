@@ -40,7 +40,8 @@ requirejs.config({
         FileSaver: 'bower-libs/FileSaver/FileSaver',
         stacktrace: 'bower-libs/stacktrace/stacktrace',
         'requirejs-text': 'bower-libs/requirejs-text/text',
-        'bootstrap-tour': 'bower-libs/bootstrap-tour/build/js/bootstrap-tour'
+        'bootstrap-tour': 'bower-libs/bootstrap-tour/build/js/bootstrap-tour',
+        jsPDF: 'libs/jspdf.amd.min'
     },
     shim: {
         underscore: {

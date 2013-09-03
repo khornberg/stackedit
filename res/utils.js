@@ -4,6 +4,7 @@ define([
     "crel",
     "FileSaver",
     "stacktrace",
+    "jsPDF",
 ], function($, _, crel) {
 
     var utils = {};
