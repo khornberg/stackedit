@@ -1309,9 +1309,6 @@ th.visible-print,td.visible-print{display:none !important}
 .popover[class*="tour-"] .popover-navigation *[data-role=prev].disabled,.popover[class*="tour-"] .popover-navigation *[data-role=next].disabled,.popover[class*="tour-"] .popover-navigation *[data-role=end].disabled{cursor:default}
 .popover[class*="tour-"].orphan{position:fixed;margin-top:0}
 .popover[class*="tour-"].orphan .arrow{display:none}
-.popover{max-width:400px;padding:20px;-webkit-box-shadow:0 5px 30px rgba(0,0,0,0.4);box-shadow:0 5px 30px rgba(0,0,0,0.4)}
-.popover .popover-title{font-weight:500;font-size:24px;padding:5px 15px 10px}
-.popover .disabled{display:none}
 body{tab-size:4}
 #preview-contents{padding:15px;margin-bottom:50px;background-color:#f1f1f1}
 .ui-layout-east #preview-contents{padding-left:5px}
@@ -1357,7 +1354,7 @@ body{tab-size:4}
 .navbar .nav.pull-right>li>.dropdown-menu{right:0;left:auto}
 .navbar .nav.pull-right>li>.dropdown-menu .dropdown-menu{right:100%;left:auto;margin-right:-1px;margin-left:0}
 .navbar .btn-group>.btn.disabled *,.navbar .btn-group>.btn.blocked *,.navbar .btn-group>.btn[disabled] *{color:rgba(84,84,84,0.3)}
-.navbar .file-title-navbar{padding:4px 15px;font-size:20px;font-weight:200;color:#545454;max-width:400px;overflow:hidden}
+.navbar .file-title-navbar{padding:4px 15px;font-size:20px;font-weight:200;color:#545454;max-width:320px;overflow:hidden}
 .navbar .file-title-navbar i{margin-right:6px}
 .navbar .input-file-title{margin-right:10px}
 .navbar .working-indicator{width:50px;height:17px;background-position:0 0;margin-top:12px}
@@ -1381,7 +1378,7 @@ body{tab-size:4}
 .document-panel .panel-content .icon-layers{font-size:135%}
 .document-panel .search-bar{position:absolute;background-color:#f1f1f1;margin:-10px 25px 0;padding:20px 5px 10px 15px;z-index:3;border:1px solid #e7e7e7;border-top:0;border-radius:6px}
 .document-panel .search-bar .form-control{padding:8px 30px 8px 12px}
-.document-panel .search-bar .close{position:absolute;line-height:10px;margin-left:-30px;margin-top:2px;padding:0 8px 4px;font-weight:normal;height:34px}
+.document-panel .search-bar .close{position:absolute;float:none;line-height:10px;margin:2px 0 2px -30px;padding:0 8px 4px;font-weight:normal;height:34px}
 .document-panel .list-group-item{margin:0}
 .document-panel .folder{font-weight:bold;color:#545454;font-size:15px;border-bottom-color:#f1f1f1}
 .document-panel .list-group{margin:0}
@@ -1458,10 +1455,28 @@ body{tab-size:4}
 .ui-layout-resizer.ui-layout-resizer-east .ui-layout-toggler-north{width:35px !important;height:60px !important}
 .ui-layout-resizer.ui-layout-resizer-south .ui-layout-toggler-north{height:35px !important}
 a code{color:inherit}
-h1{margin:30px 0 30px}
+h1{margin:40px 0}
+h2{margin:30px 0}
+h3{margin:20px 0}
+h4,h5,h6{margin:15px 0}
 .toc ul{list-style-type:none}
-p,pre,blockquote{margin:0 0 20px}
+p,pre,blockquote{margin:0 0 15px}
 hr{border-top:1px solid #ddd;margin:30px 0}
+code,pre{font-family:Menlo,Consolas,"Courier New",monospace;font-size:12px !important}
+pre{padding:9.5px !important;border:1px solid #dddddd !important}
+pre code{background-color:transparent !important}
+dt,dd{margin-top:5px;margin-bottom:5px}
+dd{margin-left:40px}
+table{margin-bottom:20px}
+table th,table td{padding:8px;line-height:20px;text-align:left;vertical-align:top;border-top:1px solid #dddddd}
+table th{font-weight:bold}
+table thead th{vertical-align:bottom}
+table caption+thead tr:first-child th,table caption+thead tr:first-child td,table colgroup+thead tr:first-child th,table colgroup+thead tr:first-child td,table thead:first-child tr:first-child th,table thead:first-child tr:first-child td{border-top:0}
+table tbody+tbody{border-top:2px solid #dddddd}
+blockquote{border-left-width:10px}
+blockquote p{margin-bottom:15px;font-size:14px;line-height:20px}
+blockquote ul:last-child,blockquote ol:last-child{margin-bottom:0}
+ul,ol{margin-bottom:15px}
 #wmd-input{-webkit-box-shadow:none;box-shadow:none}
 #wmd-input,#md-section-helper{resize:none;border:none !important}
 #md-section-helper{position:absolute;top:-100px;height:1px;padding:0 6px;overflow-y:scroll;z-index:-1}
@@ -1500,24 +1515,12 @@ div.dropdown-menu textarea{width:250px;height:150px;resize:none}
 .action-import-image-gplus{float:left}
 .tooltip-inner{text-align:left}
 .tooltip li{line-height:1.4}
-code,pre{font-family:Menlo,Consolas,"Courier New",monospace;font-size:12px !important}
-pre{padding:9.5px !important;border:1px solid #dddddd !important}
-pre code{background-color:transparent !important}
-dt,dd{margin-top:5px;margin-bottom:5px}
-dd{margin-left:40px}
-table{margin-bottom:20px}
-table th,table td{padding:8px;line-height:20px;text-align:left;vertical-align:top;border-top:1px solid #dddddd}
-table th{font-weight:bold}
-table thead th{vertical-align:bottom}
-table caption+thead tr:first-child th,table caption+thead tr:first-child td,table colgroup+thead tr:first-child th,table colgroup+thead tr:first-child td,table thead:first-child tr:first-child th,table thead:first-child tr:first-child td{border-top:0}
-table tbody+tbody{border-top:2px solid #dddddd}
-blockquote{border-left-width:10px}
-blockquote p{margin-bottom:20px;font-size:14px;font-weight:300;line-height:20px}
-blockquote ul:last-child,blockquote ol:last-child{margin-bottom:0}
-ul,ol{margin-bottom:20px}
 input[type="file"]{line-height:inherit;height:inherit;border:none !important}
 .drop-zone{border:2px dashed #bbb;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;padding:40px;text-align:center;font-size:24px;color:#bbb}
 .modal-import-harddrive-html textarea{width:530px;max-width:530px;height:120px}
+.popover{max-width:360px;padding:15px;-webkit-box-shadow:0 5px 30px rgba(0,0,0,0.4);box-shadow:0 5px 30px rgba(0,0,0,0.4)}
+.popover .popover-title{font-weight:500;font-size:24px;padding:10px 15px}
+.popover .disabled{display:none}
 div.jGrowl{z-index:1040;font-size:inherit}
 div.jGrowl div.jGrowl-notification,div.jGrowl div.jGrowl-closer{background-color:rgba(118,118,118,0.9);width:260px;margin:20px 30px;padding:15px 20px;-ms-filter:none;filter:none;border-radius:5px}
 div.jGrowl div.jGrowl-notification{min-height:80px}
