@@ -41,7 +41,7 @@ requirejs.config({
         stacktrace: 'bower-libs/stacktrace/stacktrace',
         'requirejs-text': 'bower-libs/requirejs-text/text',
         'bootstrap-tour': 'bower-libs/bootstrap-tour/build/js/bootstrap-tour',
-        jsPDF: 'bower-libs/jspdf/dist/jspdf.amd.min'
+        jsPDF: 'bower-libs/jspdf/dist/jspdf.source'
     },
     shim: {
         underscore: {
@@ -102,7 +102,10 @@ requirejs.config({
         ],
         'libs/Markdown.Editor': [
             'libs/Markdown.Converter'
-        ]
+        ],
+        jsPDF: {
+            exports: 'jsPDF'
+        },
     }
 });
 
