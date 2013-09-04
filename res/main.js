@@ -41,7 +41,7 @@ requirejs.config({
         stacktrace: 'bower-libs/stacktrace/stacktrace',
         'requirejs-text': 'bower-libs/requirejs-text/text',
         'bootstrap-tour': 'bower-libs/bootstrap-tour/build/js/bootstrap-tour',
-        jsPDF: 'libs/jspdf.amd.min'
+        jsPDF: 'bower-libs/jspdf/dist/jspdf.amd.min'
     },
     shim: {
         underscore: {
